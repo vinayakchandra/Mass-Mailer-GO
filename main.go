@@ -1,16 +1,16 @@
 package main
 
 import (
-    "bytes"
-    "encoding/csv"
-    "fmt"
-    "github.com/joho/godotenv"
-    "gopkg.in/gomail.v2"
-    "html/template"
-    "net/smtp"
-    "os"
-    "strings"
-    "time"
+	"bytes"
+	"encoding/csv"
+	"fmt"
+	"github.com/joho/godotenv"
+	"gopkg.in/gomail.v2"
+	"html/template"
+	"net/smtp"
+	"os"
+	"strings"
+	"time"
 )
 
 var senderEmail string
@@ -21,160 +21,162 @@ var htmlTemplatePath string
 var emails []string
 
 func sendMail(subject string, body string, toEmails []string) {
-    godotenv.Load()
-    auth := smtp.PlainAuth("",
-        os.Getenv("USERNAME"),
-        os.Getenv("PASSWORD"),
-        "smtp.gmail.com")
+	godotenv.Load()
+	auth := smtp.PlainAuth("",
+		os.Getenv("USERNAME"),
+		os.Getenv("PASSWORD"),
+		"smtp.gmail.com")
 
-    msg := "Subject: " + subject + "\n" + body
+	msg := "Subject: " + subject + "\n" + body
 
-    err := smtp.SendMail(
-        "smtp.gmail.com:587",
-        auth,
-        "vinayakcsurya@gmail.com",
-        toEmails,
-        []byte(msg),
-
-    )
-    if err != nil {
-        fmt.Printf("Error: %v\n", err)
-    }
+	err := smtp.SendMail(
+		"smtp.gmail.com:587",
+		auth,
+		"vinayakcsurya@gmail.com",
+		toEmails,
+		[]byte(msg),
+	)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
 
 }
 
 func sendMailHTML(subject string, templatePath string, toEmails []string) {
-    // Get html
-    var body bytes.Buffer
-    t, err := template.ParseFiles(templatePath)
-    t.Execute(&body, nil)
+	// Get html
+	var body bytes.Buffer
+	t, err := template.ParseFiles(templatePath)
+	t.Execute(&body, nil)
 
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-    auth := smtp.PlainAuth(
-        "",
-        "vinayakcsurya@gmail.com",
-        "lblvwntpckhbbjds",
-        "smtp.gmail.com",
-    )
+	auth := smtp.PlainAuth(
+		"",
+		"vinayakcsurya@gmail.com",
+		"lblvwntpckhbbjds",
+		"smtp.gmail.com",
+	)
 
-    Headers := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
-    msg := "Subject: " + subject + "\n" + Headers + "\n\n" + body.String()
+	Headers := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";"
+	msg := "Subject: " + subject + "\n" + Headers + "\n\n" + body.String()
 
-    err = smtp.SendMail(
-        "smtp.gmail.com:587",
-        auth,
-        "vinayakcsurya@gmail.com",
-        toEmails,
-        []byte(msg),
-
-    )
-    if err != nil {
-        fmt.Printf("Error: %v\n", err)
-    }
+	err = smtp.SendMail(
+		"smtp.gmail.com:587",
+		auth,
+		"vinayakcsurya@gmail.com",
+		toEmails,
+		[]byte(msg),
+	)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
 
 }
 
 func sendGoMail(subject string, templatePath string, toEmails []string) {
-    // Get html
-    var body bytes.Buffer
-    t, err := template.ParseFiles(templatePath)
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
-    t.Execute(&body, struct{ Name string }{Name: "vinu"})
+	// Get html
+	var body bytes.Buffer
+	t, err := template.ParseFiles(templatePath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	t.Execute(&body, struct{ Name string }{Name: "vinu"})
 
-    //send with go mail
-    m := gomail.NewMessage()
-    m.SetHeader("From", "vinayakcsurya@gmail.com")
-    m.SetHeader("To", toEmails...)
-    //m.SetAddressHeader("Cc", "dan@example.com", "Dan")
-    m.SetHeader("Subject", subject)
-    m.SetBody("text/html", body.String())
-    m.Attach("img.png")
+	//send with go mail
+	m := gomail.NewMessage()
+	m.SetHeader("From", "vinayakcsurya@gmail.com")
+	m.SetHeader("To", toEmails...)
+	//m.SetAddressHeader("Cc", "dan@example.com", "Dan")
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", body.String())
+	m.Attach("img.png")
 
-    d := gomail.NewDialer("smtp.gmail.com", 587, "vinayakcsurya@gmail.com", "lblvwntpckhbbjds")
+	d := gomail.NewDialer("smtp.gmail.com", 587, "vinayakcsurya@gmail.com", "lblvwntpckhbbjds")
 
-    // Send the email to Bob, Cora and Dan.
-    if err := d.DialAndSend(m); err != nil {
-        panic(err)
-    }
+	// Send the email to Bob, Cora and Dan.
+	if err := d.DialAndSend(m); err != nil {
+		panic(err)
+	}
 }
 
 func CliPrompt() {
-    //fmt.Println(asciiText1)
-    //fmt.Println(asciiText2)
-    fmt.Print("Welcome to mass mailer made with GO")
-    fmt.Println()
+	//fmt.Println(asciiText1)
+	//fmt.Println(asciiText2)
+	fmt.Print("Welcome to mass mailer made with GO!")
+	fmt.Println()
 
-    fmt.Print("Enter Senders email address: ")
-    //fmt.Scanf("%s", &senderEmail)
+	fmt.Print("Enter Senders email address: ")
+	//fmt.Scanf("%s", &senderEmail)
 
-    fmt.Print("Path to csv file: ")
-    fmt.Scanf("%s", &csvFilePath)
-    //csvFilePath = "/Users/vinayak/IdeaProjects/GO-projects/mailer/emails.csv"
+	fmt.Print("Path to csv file: ")
+	fmt.Scanf("%s", &csvFilePath)
+	//csvFilePath = "/Users/vinayak/IdeaProjects/GO-projects/mailer/emails.csv"
 
-    fmt.Printf("Path to html template: ")
-    fmt.Scanf("%s", &htmlTemplatePath)
-    //htmlTemplatePath := "/Users/vinayak/IdeaProjects/GO-projects/mailer/template.html"
+	fmt.Printf("Path to html template: ")
+	fmt.Scanf("%s", &htmlTemplatePath)
+	//htmlTemplatePath := "/Users/vinayak/IdeaProjects/GO-projects/mailer/template.html"
 
-    fmt.Print("Subject: ")
-    fmt.Scanf("%s", &subject)
-    //subject = "this is a subject"
+	fmt.Print("Subject: ")
+	fmt.Scanf("%s", &subject)
+	//subject = "this is a subject"
 
-    fmt.Print("Confirm? [y/n]: ")
-    fmt.Scanf("%s", &confirm)
+	fmt.Print("Confirm? [y/n]: ")
+	fmt.Scanf("%s", &confirm)
 
-    ReadCSV(csvFilePath)
-    time.Sleep(1 * time.Second)
-    sendGoMail(subject, htmlTemplatePath, emails)
+	if confirm == "y" {
+		ReadCSV(csvFilePath)
+		time.Sleep(1 * time.Second)
+		sendGoMail(subject, htmlTemplatePath, emails)
+	} else {
+		fmt.Println("Stopped from sending email!")
+	}
+
 }
 
 func ReadCSV(csvFilePath string) {
-    // Open the CSV file
-    file, err := os.Open(csvFilePath)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
-    }
-    defer file.Close()
+	// Open the CSV file
+	file, err := os.Open(csvFilePath)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	defer file.Close()
 
-    // Create a new CSV reader
-    reader := csv.NewReader(file)
+	// Create a new CSV reader
+	reader := csv.NewReader(file)
 
-    // Read all the rows from the CSV
-    records, err := reader.ReadAll()
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
-    }
-    // Iterate through each record (row)
-    for i, record := range records {
-        fmt.Printf("Record %d: %v\n", i+1, record)
+	// Read all the rows from the CSV
+	records, err := reader.ReadAll()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	// Iterate through each record (row)
+	for i, record := range records {
+		fmt.Printf("Record %d: %v\n", i+1, record)
 
-        // Assuming the emails in each row are separated by commas
-        // Loop through each column in the record
-        for _, field := range record {
-            // Split the emails in the field by commas
-            splitEmails := strings.Split(field, ",")
-            // Append each email to the emails slice
-            emails = append(emails, splitEmails...)
-        }
-    }
+		// Assuming the emails in each row are separated by commas
+		// Loop through each column in the record
+		for _, field := range record {
+			// Split the emails in the field by commas
+			splitEmails := strings.Split(field, ",")
+			// Append each email to the emails slice
+			emails = append(emails, splitEmails...)
+		}
+	}
 
-    fmt.Println("Emails:", emails)
+	fmt.Println("Emails:", emails)
 }
 
 func main() {
-    //subject := "This is a html subject"
-    //templatePath := "/Users/vinayak/IdeaProjects/GO-projects/mailer/template.html"
-    //csv := "/Users/vinayak/IdeaProjects/GO-projects/mailer/emails.csv"
-    //emails := []string{"vinayak.chandra.suryavanshi@gmail.com", "vs9419@srmist.edu.in"}
-    //sendGoMail("This is a subject", "/Users/vinayak/IdeaProjects/GO-projects/mailer/template.html", emails)
-    CliPrompt()
-
+	//subject := "This is a html subject"
+	//templatePath := "/Users/vinayak/IdeaProjects/GO-projects/mailer/template.html"
+	//csv := "/Users/vinayak/IdeaProjects/GO-projects/mailer/emails.csv"
+	//emails := []string{"vinayak.chandra.suryavanshi@gmail.com", "vs9419@srmist.edu.in"}
+	//sendGoMail("This is a subject", "/Users/vinayak/IdeaProjects/GO-projects/mailer/template.html", emails)
+	CliPrompt()
 }
